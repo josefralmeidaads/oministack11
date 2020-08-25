@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,500;0,700;1,400&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    box-sizing: border-box; /*Evita que as margens somem junto com a altura e largura do elemento*/
+}
+
+body{
+    font: 400 14px Roboto, sans-serif;
+    background: #F0F0F5;
+    -webkit-font-smoothing: antialiased; /* Deixa a letra mais npitida*/
+}
+
+input, button, textarea {
+    font: 400 18px Roboto, sans-serif;
+}
+
+button {
+    cursor: pointer; /* Definindo todos os botões com o cursor*/
+}
+
+form input {
+    width: 100%;
+    height: 60px;
+    color: #333;
+    border: 1px solid #dcdce6;
+    border-radius: 8px;
+    padding: 0 24px;
+}
+
+form textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 140px;
+    height: 60px;
+    color: #333;
+    border: 1px solid #dcdce6;
+    border-radius: 8px;
+    padding: 16px 24px;
+    line-height: 24px;
+}
+
+.button{
+    width: 100%;
+    height: 60px;
+    border: 0;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 700;
+    margin-top: 16px;
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 60px;
+    background-color: #E02041;
+    transition: 0.2s;
+}
+
+.button:hover{
+    filter: brightness(90%); /*Escurecendo a cor em 10%*/
+}
+
+.back-link {
+    display: flex;
+    text-decoration: none;
+    font-weight: 500;
+    color: #41414D;
+    margin-left: 0;
+    font-size: 18px;
+    align-items: center;
+    margin-top: 40px;
+    transition: opacity 0.2;
+}
+
+.back-link svg{
+    margin-right: 8px;
+}
+
+.back-link:hover {
+    opacity: 0.8;
+}
+
