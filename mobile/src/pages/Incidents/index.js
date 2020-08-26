@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { View, FlatList, Image, Text, TouchableOpacity } from 'react-native';
+import api from  '../../services/api'
 
 
 import logoImg from '../../assets/logo.png';
@@ -9,12 +10,48 @@ import logoImg from '../../assets/logo.png';
 import styles from './styles';
 
 const Incidents = () => {
+  const [incidents, setIncidents] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1); // para controlar o loading de casos e tornar a página infinita
+  const [loading, setLoading] = useState(false);
 
+  const loadIncidents = async() => {
+    if (loading){
+      return; // se for verdadeiro o loading não irá carregar mais nada até finalizar o loading da requisição atual
+    }
 
+    if(total > 0 && incidents.length == total){
+      return; // SE MEU TOTAL de registros for maior que zero e se a quantidade de registro impresso na página for igual ao meu contador de registros
+    }
+
+    setLoading(true);
+
+    try{
+      const response = await api.get('incidents', {
+        params: {
+          page
+        }
+      })
+
+      setIncidents([...incidents, ...response.data]); // toda vez que carregar novos dados anexo aos dados existentes
+      setTotal(response.headers['x-total-count'])
+      setPage(page + 1)
+      setLoading(false)
+    }catch(error){
+      alert('Falha no Carregamento Tente Novamente')
+    }
+  }
+
+  useEffect(() => {
+    loadIncidents();
+  }, [])
+
+  
+  
   const navigation = useNavigation();
 
-  function navigateToDetail() {
-    navigation.navigate('Detail');
+  function navigateToDetail(incident) { // enviando os dados de incident carregados pelo estado e mapeado pelo FlatList
+    navigation.navigate('Detail', {incident}); // estou enviando as informações do estado indicent para a tela que estou sendo guiado
   }
 
   return (
@@ -22,7 +59,7 @@ const Incidents = () => {
       <View style={styles.header}>
         <Image source={logoImg} />
         <Text style={styles.headerText}>
-          Total de <Text style={styles.headerTextBold}>5 casos</Text>.
+  Total de <Text style={styles.headerTextBold}>{total} casos</Text>.
         </Text>
       </View>
 
@@ -30,26 +67,28 @@ const Incidents = () => {
       <Text style={styles.description}>Escolha um dos casos abaixo e salve o dia.</Text>
 
       <FlatList
-        data={[1, 2 , 3]}
+        data={incidents}
         style={styles.incidentList}
-        keyExtractor={incident => String(incident)}
+        keyExtractor={incident => String(incident.id)}
         showsVerticalScrollIndicator={false}
-        renderItem={() => (
+        onEndReached={loadIncidents} // toda vez que o usuário chegar ao final dá página execute essa função
+        onEndReachedThreshold={0.2} // quando falta 20% por cento da página execute o onEndReached
+        renderItem={({item: incident}) => (
           <View style={styles.incident}>
             <Text style={styles.incidentProperty}>ONG:</Text>
-            <Text style={styles.incidentValue}>APAD</Text>
+            <Text style={styles.incidentValue}>{incident.name}</Text>
 
-            <Text style={styles.incidentProperty}>CASO:</Text>
-            <Text style={styles.incidentValue}>Cadela atropelada</Text>
+            <Text style={styles.incidentProperty}>{incident.title}</Text>
+        <Text style={styles.incidentValue}>{incident.description}</Text>
 
             <Text style={styles.incidentProperty}>VALOR:</Text>
             <Text style={styles.incidentValue}>
-              R$ 120,00
+              {Intl.NumberFormat('pt-BR',{ style: 'currency', currency: 'BRL' }).format(incident.value)}
             </Text>
 
             <TouchableOpacity 
               style={styles.detailsButton} 
-              onPress={navigateToDetail}
+              onPress={() => navigateToDetail(incident)} // não posso passar uma função para ser executada, por isso passo uma callback que entregara o valor quando puder
             >
               <Text style={styles.detailsButtonText}>Ver mais detalhes</Text>
               <Feather name="arrow-right" size={16} color="#E02041" />            
